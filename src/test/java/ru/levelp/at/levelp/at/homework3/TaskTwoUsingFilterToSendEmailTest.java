@@ -16,14 +16,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TaskTwoUsingFilterToSendEmailTest extends LocatorsBaseTest{
-    String bodyText = "My beautiful letter text";
     String subject = "My beautiful theme to test the word Test";
-    String to = "ashanskaya_spam@mail.ru";
-
-    @BeforeEach
-    void setUp(){
-       super.setUp();
-    }
 
     @Test
     void testUsingFilterToSendEmail() {
@@ -32,45 +25,49 @@ public class TaskTwoUsingFilterToSendEmailTest extends LocatorsBaseTest{
 
         driver.navigate().to("https://mail.ru/");
 
-//---------------------1. Войти в почту
+        //---------------------1. Войти в почту
 
         driver.findElement(By.cssSelector("[data-testid='enter-mail-primary']")).click(); //нажатие на КНОПКУ "ВОЙТИ"
 
         WebElement frame = driver.findElement(By.cssSelector("iframe.ag-popup__frame__layout__iframe")); //нашли фрейм, в котором открылась авторизация
         WebDriver frameDriver = driver.switchTo().frame(frame); //переключились на него
-        frameDriver.findElement(By.cssSelector("[name='username']")).sendKeys("ashanskaya_spam@mail.ru"); //вводим адресс почты уже во фрейме
-        var enteredAccount = "ashanskaya_spam@mail.ru";
+        frameDriver.findElement(By.cssSelector("[name='username']")).sendKeys(USER_LOGIN); //вводим адресс почты уже во фрейме
 
         frameDriver.findElement(By.cssSelector("[name='username']")).sendKeys(Keys.ENTER); //имитируем нажатие клавиши ENTER
-       // frameDriver.findElement(By.cssSelector("[data-test-id='next-button']")).click(); //клик на КНОПКУ "Ввести пароль"
+        // frameDriver.findElement(By.cssSelector("[data-test-id='next-button']")).click(); //клик на КНОПКУ "Ввести пароль"
 
-        frameDriver.findElement(By.cssSelector("[name='password']")).sendKeys("Pavel1508"); //вводим пароль
+        frameDriver.findElement(By.cssSelector("[name='password']")).sendKeys(USER_PASSWORD); //вводим пароль
 
         frameDriver.findElement(By.cssSelector("[name='password']")).sendKeys(Keys.ENTER); //имитируем нажатие клавиши ENTER
-      // frameDriver.findElement(By.cssSelector("[data-test-id='submit-button']")).click(); //клик на КНОПКУ "ВОЙТИ"
+        // frameDriver.findElement(By.cssSelector("[data-test-id='submit-button']")).click(); //клик на КНОПКУ "ВОЙТИ"
 
-//---------------------2.Assert, что вход выполнен успешно
+        //---------------------2.Assert, что вход выполнен успешно
 
         driver.navigate().refresh();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.ph-project__account")));
+        assertThat(USER_LOGIN).isEqualTo(driver.findElement(By.cssSelector("div.ph-project__account")).getAttribute("aria-label")); //сравниваю адреса почты
 
-        assertThat(enteredAccount).isEqualTo(driver.findElement(By.cssSelector("div.ph-project__account")).getAttribute("aria-label")); //сравниваю адреса почты
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".ph-project-promo-close-icon"))).click();//закрыть всплывашку
 
 //--------------------- 2.1.Заходим в отправленные и проверяем колличество писем ДО создания нового
 
-        driver.navigate().to("https://e.mail.ru/sent/");
+        driver.findElement(By.cssSelector(BUTTON_SENT)).click();
+        wait.until(ExpectedConditions.titleIs(PAGE_TITLE_SENT));
 
         int sendLetterCountBefore = driver.findElements(By.cssSelector("a.js-letter-list-item")).size();
 
 //-------------------- 2.2. Заходим в папку Тест и проверяем колличество писем ДО создания нового
 
-        driver.navigate().to("https://e.mail.ru/1/");
+        driver.findElement(By.cssSelector(BUTTON_TEST)).click();
+        wait.until(ExpectedConditions.urlToBe(URL_PAGE_TEST));
 
         int packageLetterCountBefore = driver.findElements(By.cssSelector("a.js-letter-list-item")).size();
 
 //---------------------3.Создать новое письмо (заполнить адресата (самого себя), тему письма (должно содержать слово Тест) и тело)
 
-        driver.navigate().to("https://e.mail.ru/compose/");
-        //driver.findElement(By.cssSelector(".compose-button__wrapper")).click(); //нажали на кнопку "Написать письмо"
+        driver.findElement(By.cssSelector(BUTTON_COMPOSE));
+
+        driver.findElement(By.cssSelector("span[class='compose-button__wrapper']")).click();
 
         driver.findElement(By.cssSelector(".container--H9L5q")).click();
         driver.findElement(By.cssSelector("[type='text']")).sendKeys(to);
@@ -78,19 +75,20 @@ public class TaskTwoUsingFilterToSendEmailTest extends LocatorsBaseTest{
         driver.findElement(By.cssSelector("[name='Subject']")).click();
         driver.findElement(By.cssSelector("[name='Subject']")).sendKeys(subject);
 
+        driver.findElement(By.cssSelector("[name='Subject']")).click();
         driver.findElement(By.cssSelector("div.cke_editable")).sendKeys(bodyText);
 
 //---------------------4.Отправить письмо
 
         driver.findElement(By.cssSelector("[data-test-id='send']")).click(); //нажатие на КНОПКУ "Отправить"
-        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("span[class='button2 button2_has-ico button2_has-ico-s button2_close button2_pure button2_short button2_hover-support']")));
-        driver.findElement(By.cssSelector("span[class='button2 button2_has-ico button2_has-ico-s button2_close button2_pure button2_short button2_hover-support']")).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("span[class*='button2_close']")));
+        driver.findElement(By.cssSelector("span[class*='button2_close']")).click();
 
 //---------------------5. Verify, что письмо появилось в папке отправленные
 
-        driver.navigate().to("https://e.mail.ru/sent/");
-        wait.until(ExpectedConditions.urlToBe("https://e.mail.ru/sent/"));
-        driver.navigate().refresh();
+        driver.findElement(By.cssSelector(BUTTON_SENT)).click();
+        //  wait.until(ExpectedConditions.urlToBe(URL_PAGE_SENT));
+        wait.until(ExpectedConditions.titleIs(PAGE_TITLE_SENT));
 
         List<WebElement> sendtLetter = driver.findElements(By.cssSelector("a.js-letter-list-item"));
         int sendLetterCountAfter = sendtLetter.size();
@@ -102,8 +100,8 @@ public class TaskTwoUsingFilterToSendEmailTest extends LocatorsBaseTest{
 
 //---------------------6. Verify, что письмо появилось в папке Тест
 
-        driver.navigate().to("https://e.mail.ru/1/");
-        wait.until(ExpectedConditions.urlToBe("https://e.mail.ru/1/"));
+        driver.findElement(By.cssSelector(BUTTON_TEST)).click();
+        wait.until(ExpectedConditions.urlToBe(URL_PAGE_TEST));
 
         int packageLetterCountAfter = driver.findElements(By.cssSelector("a.js-letter-list-item")).size();
         Verify.verify(packageLetterCountBefore+1 == packageLetterCountAfter);
@@ -111,14 +109,12 @@ public class TaskTwoUsingFilterToSendEmailTest extends LocatorsBaseTest{
 //---------------------7. Verify контент, адресата и тему письма (должно совпадать с пунктом 3)
 
         driver.navigate().to(hrefLastLetter);
-        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("span[class='button2 button2_has-ico button2_has-ico-s button2_reply button2_pure button2_hover-support js-shortcut']")));
+        driver.navigate().refresh();
 
         String emailAddresLeter = driver.findElement(By.cssSelector("span.letter-contact")).getAttribute("title");
-
         Verify.verify(emailAddresLeter.equals(to));
 
         String subjectMail = driver.findElement(By.cssSelector("div[class='thread__subject-line'] h2.thread-subject")).getText();
-
         Verify.verify(subjectMail.equals("Self: " + subject));
 
         String emailValue = driver.findElement(By.cssSelector("div.js-readmsg-msg > div > div > div > div")).getText();
@@ -127,14 +123,7 @@ public class TaskTwoUsingFilterToSendEmailTest extends LocatorsBaseTest{
 //---------------------8. Выйти из учётной записи
 
         driver.findElement(By.cssSelector("span[class*='ph-dropdown-icon']")).click();
-
-        driver.findElement(By.cssSelector("div[class*='ph-text'] > div")).click();
-        driver.findElement(By.cssSelector("div[data-testid*='whiteline-account-exit'] > div.ph-text")).click();
+        driver.findElement(By.cssSelector("div[data-testid*='whiteline-account-exit']")).click();
        }
-
-    @AfterEach
-    void tearDawn() {
-        driver.quit();
-    }
 }
 
