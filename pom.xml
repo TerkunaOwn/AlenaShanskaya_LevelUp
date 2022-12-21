@@ -105,6 +105,14 @@
                 <test.classes>homework3/*MailTest.class</test.classes>
             </properties>
         </profile>
+
+        <profile>
+            <id>homework4-all-tests</id>
+            <properties>
+                <test.classes>homework4/*ObjectTest.class</test.classes>
+            </properties>
+        </profile>
+
     </profiles>
 
     <build>
