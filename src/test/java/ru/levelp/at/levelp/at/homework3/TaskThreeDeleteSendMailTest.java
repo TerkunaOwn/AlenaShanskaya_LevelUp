@@ -17,9 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class TaskThreeDeleteSendMailTest extends LocatorsBaseTest{
-    String bodyText = "My beautiful letter text";
     String subject = "My beautiful theme";
-    String to = "ashanskaya_spam@mail.ru";
 
     @BeforeEach
     void setUp() {
@@ -33,45 +31,47 @@ public class TaskThreeDeleteSendMailTest extends LocatorsBaseTest{
 
         driver.navigate().to("https://mail.ru/");
 
-//---------------------1. Войти в почту
+        //---------------------1. Войти в почту
 
         driver.findElement(By.cssSelector("[data-testid='enter-mail-primary']")).click(); //нажатие на КНОПКУ "ВОЙТИ"
 
         WebElement frame = driver.findElement(By.cssSelector("iframe.ag-popup__frame__layout__iframe")); //нашли фрейм, в котором открылась авторизация
         WebDriver frameDriver = driver.switchTo().frame(frame); //переключились на него
-        frameDriver.findElement(By.cssSelector("[name='username']")).sendKeys("ashanskaya_spam@mail.ru"); //вводим адресс почты уже во фрейме
-        var enteredAccount = "ashanskaya_spam@mail.ru";
+        frameDriver.findElement(By.cssSelector("[name='username']")).sendKeys(USER_LOGIN); //вводим адресс почты уже во фрейме
 
         frameDriver.findElement(By.cssSelector("[name='username']")).sendKeys(Keys.ENTER); //имитируем нажатие клавиши ENTER
-       // frameDriver.findElement(By.cssSelector("[data-test-id='next-button']")).click(); //клик на КНОПКУ "Ввести пароль"
+        // frameDriver.findElement(By.cssSelector("[data-test-id='next-button']")).click(); //клик на КНОПКУ "Ввести пароль"
 
-        frameDriver.findElement(By.cssSelector("[name='password']")).sendKeys("Pavel1508"); //вводим пароль
+        frameDriver.findElement(By.cssSelector("[name='password']")).sendKeys(USER_PASSWORD); //вводим пароль
 
         frameDriver.findElement(By.cssSelector("[name='password']")).sendKeys(Keys.ENTER); //имитируем нажатие клавиши ENTER
-      // frameDriver.findElement(By.cssSelector("[data-test-id='submit-button']")).click(); //клик на КНОПКУ "ВОЙТИ"
+        // frameDriver.findElement(By.cssSelector("[data-test-id='submit-button']")).click(); //клик на КНОПКУ "ВОЙТИ"
 
-//---------------------2.Assert, что вход выполнен успешно
+        //---------------------2.Assert, что вход выполнен успешно
 
         driver.navigate().refresh();
-
-        String actualAccount = driver.findElement(By.cssSelector("div.ph-project__account")).getAttribute("aria-label");
-        assertThat(enteredAccount).isEqualTo(actualAccount);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.ph-project__account")));
+        assertThat(USER_LOGIN).isEqualTo(driver.findElement(By.cssSelector("div.ph-project__account")).getAttribute("aria-label")); //сравниваю адреса почты
 
 //--------------------- 2.1.Заходим в Входящие и проверяем колличество писем ДО отправки нового
 
-        driver.navigate().to("https://e.mail.ru/tomyself/");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".ph-project-promo-close-icon"))).click();//закрыть всплывашку
+
+        driver.findElement(By.cssSelector(BUTTON_TOMYSELF)).click();
+        wait.until(ExpectedConditions.urlToBe(URL_PAGE_TOMYSELF));
 
         int incomingLetterCountBefore = driver.findElements(By.cssSelector("a.js-letter-list-item")).size();
 
 //-------------------- 2.2. Заходим в папку Корзина и проверяем колличество писем ДО удаления нового
 
-        driver.navigate().to("https://e.mail.ru/trash/");
+        driver.findElement(By.cssSelector(BUTTON_TRASH)).click();
+        wait.until(ExpectedConditions.urlToBe(URL_PAGE_TRASH));
 
         int deleteLetterCountBefore = driver.findElements(By.cssSelector("a.js-letter-list-item")).size();
 
 //---------------------3. Создать новое письмо (заполнить адресата (самого себя), тему письма и тело)
 
-        driver.findElement(By.cssSelector("span[class='compose-button__wrapper']")).click(); //нажали на кнопку "Написать письмо"
+        driver.findElement(By.cssSelector(BUTTON_COMPOSE)).click(); //нажали на кнопку "Написать письмо"
 
         driver.findElement(By.cssSelector(".container--H9L5q")).click();
         driver.findElement(By.cssSelector("[type='text']")).sendKeys(to);
@@ -84,13 +84,13 @@ public class TaskThreeDeleteSendMailTest extends LocatorsBaseTest{
 //---------------------4.Отправить письмо
 
         driver.findElement(By.cssSelector("[data-test-id='send']")).click(); //нажатие на КНОПКУ "Отправить"
-        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("span[class='button2 button2_has-ico button2_has-ico-s button2_close button2_pure button2_short button2_hover-support']")));
-        driver.findElement(By.cssSelector("span[class='button2 button2_has-ico button2_has-ico-s button2_close button2_pure button2_short button2_hover-support']")).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("span[class*='button2_close']")));
+        driver.findElement(By.cssSelector("span[class*='button2_close']")).click();
 
 //---------------------5. Verify, что письмо появилось в папке Входящие
 
-        driver.navigate().to("https://e.mail.ru/tomyself/");
-        wait.until(ExpectedConditions.urlToBe("https://e.mail.ru/tomyself/"));
+        driver.findElement(By.cssSelector(BUTTON_TOMYSELF)).click();
+        wait.until(ExpectedConditions.urlToBe(URL_PAGE_TOMYSELF));
 
         driver.navigate().refresh();
 
@@ -104,11 +104,9 @@ public class TaskThreeDeleteSendMailTest extends LocatorsBaseTest{
 //---------------------6. Verify контент, адресата и тему письма (должно совпадать с пунктом 3)
 
         driver.navigate().to(hrefLastLetter);
-        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("span[class='button2 button2_has-ico button2_has-ico-s button2_reply button2_pure button2_hover-support js-shortcut']")));
-
+        driver.navigate().refresh();
 
         String emailAddresLeter = driver.findElement(By.cssSelector("span.letter-contact")).getAttribute("title");
-
         Verify.verify(emailAddresLeter.equals(to));
 
         String subjectMail = driver.findElement(By.cssSelector("h2.thread-subject")).getText();
@@ -119,11 +117,12 @@ public class TaskThreeDeleteSendMailTest extends LocatorsBaseTest{
 
 //---------------------7. Удалить письмо
 
-        driver.findElement(By.cssSelector("span[class='button2 button2_has-ico button2_has-ico-s button2_delete button2_pure button2_ico-text-top button2_hover-support js-shortcut']")).click();
+        driver.findElement(By.cssSelector("span[class*='button2_delete']")).click();
 
 //---------------------8. Verify что письмо появилось в папке Корзина
 
-        driver.navigate().to("https://e.mail.ru/trash/");
+        driver.findElement(By.cssSelector(BUTTON_TRASH)).click();
+        wait.until(ExpectedConditions.urlToBe(URL_PAGE_TRASH));
 
         driver.navigate().refresh();
 
@@ -134,9 +133,7 @@ public class TaskThreeDeleteSendMailTest extends LocatorsBaseTest{
 //---------------------9. Выйти из учётной записи
 
         driver.findElement(By.cssSelector("span[class*='ph-dropdown-icon']")).click();
-
-        driver.findElement(By.cssSelector("div[class*='ph-text'] > div")).click();
-        driver.findElement(By.cssSelector("div[data-testid*='whiteline-account-exit'] > div.ph-text")).click();
+        driver.findElement(By.cssSelector("div[data-testid*='whiteline-account-exit']")).click();
        }
 }
 
