@@ -1,11 +1,9 @@
 package ru.levelp.at.levelp.at.homework3;
 
 import com.google.common.base.Verify;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -16,85 +14,69 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TaskOneSendMailTest extends LocatorsBaseTest{
+public class TaskOneMailTest extends LocatorsBaseTest {
     String subject = "My beautiful theme";
-
-    @BeforeEach
-    void setUp() {
-       super.setUp();
-    }
 
     @Test
     void testSendMail() {
 
-        WebDriverWait wait = new WebDriverWait(driver,Duration.ofMillis(5000));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofMillis(5000));
         driver.navigate().to("https://mail.ru/");
 
 //---------------------1. Войти в почту
 
-        driver.findElement(By.cssSelector("[data-testid='enter-mail-primary']")).click(); //нажатие на КНОПКУ "ВОЙТИ"
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[data-testid='enter-mail-primary']"))).click(); //нажатие на КНОПКУ "ВОЙТИ"
 
-        WebElement frame = driver.findElement(By.cssSelector("iframe.ag-popup__frame__layout__iframe")); //нашли фрейм, в котором открылась авторизация
-        WebDriver frameDriver = driver.switchTo().frame(frame); //переключились на него
-        frameDriver.findElement(By.cssSelector("[name='username']")).sendKeys(USER_LOGIN); //вводим адресс почты уже во фрейме
+        WebElement frame = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("iframe.ag-popup__frame__layout__iframe"))); //нашли фрейм, в котором открылась авторизация
+        driver.switchTo().frame(frame); //переключились на него
 
-        frameDriver.findElement(By.cssSelector("[name='username']")).sendKeys(Keys.ENTER); //имитируем нажатие клавиши ENTER
-       // frameDriver.findElement(By.cssSelector("[data-test-id='next-button']")).click(); //клик на КНОПКУ "Ввести пароль"
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[name='username']"))).sendKeys(USER_LOGIN); //вводим адресс почты уже во фрейме
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[name='username']"))).sendKeys(Keys.ENTER); //имитируем нажатие клавиши ENTER
 
-        frameDriver.findElement(By.cssSelector("[name='password']")).sendKeys(USER_PASSWORD); //вводим пароль
-
-        frameDriver.findElement(By.cssSelector("[name='password']")).sendKeys(Keys.ENTER); //имитируем нажатие клавиши ENTER
-      // frameDriver.findElement(By.cssSelector("[data-test-id='submit-button']")).click(); //клик на КНОПКУ "ВОЙТИ"
-
-//---------------------2.Assert, что вход выполнен успешно
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[name='password']"))).sendKeys(USER_PASSWORD); //вводим пароль
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[name='password']"))).sendKeys(Keys.ENTER); //имитируем нажатие клавиши ENTER
 
         driver.navigate().refresh();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.ph-project__account")));
+
+//---------------------2.Assert, что вход выполнен успешно
+
         assertThat(USER_LOGIN).isEqualTo(driver.findElement(By.cssSelector("div.ph-project__account")).getAttribute("aria-label")); //сравниваю адреса почты
 
 //-------------------- 2.1. Заходим в черновики и проверяем колличество писем ДО создания нового
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".ph-project-promo-close-icon"))).click();//закрыть всплывашку
 
-        driver.findElement(By.cssSelector(BUTTON_DRAFT)).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(BUTTON_DRAFT))).click();
         wait.until(ExpectedConditions.titleIs(PAGE_TITLE_DRAFT));
 
         int draftLetterCountBefore = driver.findElements(By.cssSelector("a.js-letter-list-item")).size();
 
 //--------------------- 2.2.Заходим в отправленные и проверяем колличество писем ДО создания нового
 
-        driver.findElement(By.cssSelector(BUTTON_SENT)).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(BUTTON_SENT))).click();
         wait.until(ExpectedConditions.titleIs(PAGE_TITLE_SENT));
 
         int sendLetterCountBefore = driver.findElements(By.cssSelector("a.js-letter-list-item")).size();
 
 //---------------------3.Создать новое письмо (заполнить адресата, тему письма и тело)
 
-        driver.findElement(By.cssSelector(BUTTON_COMPOSE));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(BUTTON_COMPOSE))).click();
 
-        driver.findElement(By.cssSelector("span[class='compose-button__wrapper']")).click();
-
-        driver.findElement(By.cssSelector(".container--H9L5q")).click();
-        driver.findElement(By.cssSelector("[type='text']")).sendKeys(to);
-
-        driver.findElement(By.cssSelector("[name='Subject']")).click();
-        driver.findElement(By.cssSelector("[name='Subject']")).sendKeys(subject);
-
-        driver.findElement(By.cssSelector("[name='Subject']")).click();
-        driver.findElement(By.cssSelector("div.cke_editable")).sendKeys(bodyText);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[type='text']"))).sendKeys(to);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[name='Subject']"))).sendKeys(subject);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.cke_editable"))).sendKeys(bodyText);
 
 //---------------------4. Сохранить его как черновик
 
-        driver.findElement(By.cssSelector("[data-test-id='save']")).click(); //сохраняем письмо в черновике
-        driver.findElement(By.cssSelector("button[tabindex='700']")).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[data-test-id='save']"))).click(); //сохраняем письмо в черновике
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("button[tabindex='700']"))).click();
         TimeOut.sleep(1000); //я не знаю как отловить этот момент
 
 //---------------------5. Verify, что письмо сохранено в черновиках
 
-        driver.findElement(By.cssSelector(BUTTON_DRAFT)).click();
-      //  wait.until(ExpectedConditions.urlToBe(URL_PAGE_DRAFT));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(BUTTON_DRAFT))).click();
         wait.until(ExpectedConditions.titleIs(PAGE_TITLE_DRAFT));
-
         driver.navigate().refresh();
 
         List<WebElement> draftLetter = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("a.js-letter-list-item")));
@@ -120,42 +102,34 @@ public class TaskOneSendMailTest extends LocatorsBaseTest{
 
 //---------------------7. Отправить письмо
 
-        driver.findElement(By.cssSelector(BUTTON_DRAFT)).click();
-       //wait.until(ExpectedConditions.urlToBe(URL_PAGE_DRAFT));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(BUTTON_DRAFT))).click();
         wait.until(ExpectedConditions.titleIs(PAGE_TITLE_DRAFT));
-
         driver.navigate().refresh();
 
         wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("a.js-letter-list-item"))).get(0).click();
 
-        driver.findElement(By.cssSelector("[data-test-id='send']")).click(); //нажимаем кнопку Отправить
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[data-test-id='send']"))).click(); //нажимаем кнопку Отправить
         wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("span[class*='button2_close']")));
-        driver.findElement(By.cssSelector("span[class*='button2_close']")).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("span[class*='button2_close']"))).click();
 
 //---------------------8. Verify, что письмо исчезло из черновиков
 
-        driver.findElement(By.cssSelector(BUTTON_DRAFT)).click();
-      //  wait.until(ExpectedConditions.urlToBe(URL_PAGE_DRAFT));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(BUTTON_DRAFT))).click();
         wait.until(ExpectedConditions.titleIs(PAGE_TITLE_DRAFT));
         driver.navigate().refresh();
 
-        List<WebElement> draftLetter1 = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("a.js-letter-list-item")));
-        int draftLetterCountAfter1 = draftLetter1.size();
-        Verify.verify(draftLetterCountAfter-1 == draftLetterCountAfter1);
+        wait.until(ExpectedConditions.numberOfElementsToBe(By.cssSelector("a.js-letter-list-item"), draftLetterCountAfter-1));
 
 //---------------------9. Verify, что письмо появилось в папке отправленные
 
-        driver.findElement(By.cssSelector(BUTTON_SENT)).click();
-      //  wait.until(ExpectedConditions.urlToBe(URL_PAGE_SENT));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(BUTTON_SENT))).click();
         wait.until(ExpectedConditions.titleIs(PAGE_TITLE_SENT));
-
-        int sendLetterCountAfter = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("a.js-letter-list-item"))).size();
-        Verify.verify(sendLetterCountBefore+1 == sendLetterCountAfter);
+        wait.until(ExpectedConditions.numberOfElementsToBe(By.cssSelector("a.js-letter-list-item"), sendLetterCountBefore + 1));
 
 //---------------------10. Выйти из учётной записи
 
-        driver.findElement(By.cssSelector("span[class*='ph-dropdown-icon']")).click();
-        driver.findElement(By.cssSelector("div[data-testid*='whiteline-account-exit']")).click();
-       }
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("span[class*='ph-dropdown-icon']"))).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[data-testid='whiteline-account-exit']"))).click();
+    }
 }
 
