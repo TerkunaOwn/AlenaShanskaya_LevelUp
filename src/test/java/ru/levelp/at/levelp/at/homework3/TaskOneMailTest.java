@@ -3,14 +3,12 @@ package ru.levelp.at.levelp.at.homework3;
 import com.google.common.base.Verify;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import ru.levelp.at.homework3.TimeOut;
 
 import java.time.Duration;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,33 +29,18 @@ public class TaskOneMailTest extends LocatorsBaseTest {
         driver.switchTo().frame(frame); //переключились на него
 
         wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[name='username']"))).sendKeys(USER_LOGIN); //вводим адресс почты уже во фрейме
-        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[name='username']"))).sendKeys(Keys.ENTER); //имитируем нажатие клавиши ENTER
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[data-test-id='next-button']"))).click();
 
         wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[name='password']"))).sendKeys(USER_PASSWORD); //вводим пароль
-        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[name='password']"))).sendKeys(Keys.ENTER); //имитируем нажатие клавиши ENTER
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[data-test-id='submit-button']"))).click();
 
         driver.navigate().refresh();
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.ph-project__account")));
 
 //---------------------2.Assert, что вход выполнен успешно
 
-        assertThat(USER_LOGIN).isEqualTo(driver.findElement(By.cssSelector("div.ph-project__account")).getAttribute("aria-label")); //сравниваю адреса почты
-
-//-------------------- 2.1. Заходим в черновики и проверяем колличество писем ДО создания нового
-
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".ph-project-promo-close-icon"))).click();//закрыть всплывашку
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(BUTTON_DRAFT))).click();
-        wait.until(ExpectedConditions.titleIs(PAGE_TITLE_DRAFT));
-
-        int draftLetterCountBefore = driver.findElements(By.cssSelector("a.js-letter-list-item")).size();
-
-//--------------------- 2.2.Заходим в отправленные и проверяем колличество писем ДО создания нового
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(BUTTON_SENT))).click();
-        wait.until(ExpectedConditions.titleIs(PAGE_TITLE_SENT));
-
-        int sendLetterCountBefore = driver.findElements(By.cssSelector("a.js-letter-list-item")).size();
+        assertThat(USER_LOGIN).isEqualTo(driver.findElement(By.cssSelector("div.ph-project__account")).getAttribute("aria-label")); //сравниваю адреса почты
 
 //---------------------3.Создать новое письмо (заполнить адресата, тему письма и тело)
 
@@ -75,38 +58,28 @@ public class TaskOneMailTest extends LocatorsBaseTest {
 
 //---------------------5. Verify, что письмо сохранено в черновиках
 
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(BUTTON_SENT))).click();
+        wait.until(ExpectedConditions.titleIs(PAGE_TITLE_SENT));
+        int sendLetterCountBefore = driver.findElements(By.cssSelector("a.js-letter-list-item")).size();
+
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(BUTTON_DRAFT))).click();
         wait.until(ExpectedConditions.titleIs(PAGE_TITLE_DRAFT));
-        driver.navigate().refresh();
-
-        List<WebElement> draftLetter = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("a.js-letter-list-item")));
-        int draftLetterCountAfter = draftLetter.size();
-        Verify.verify(draftLetterCountBefore+1==draftLetterCountAfter);
-
-        WebElement letterElement = draftLetter.get(0);
-        String hrefLastLetter = letterElement.getAttribute("href");
+        int draftLetterCountBefore = driver.findElements(By.cssSelector("a.js-letter-list-item")).size();
 
 //---------------------6. Verify контент, адресата и тему письма (должно совпадать с пунктом 3)
 
-        driver.navigate().to(hrefLastLetter);
-        driver.navigate().refresh();
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("a.js-letter-list-item" + ":nth-of-type(1)"))).click();
 
-        String emailAddresLeter = driver.findElement(By.cssSelector("span.letter-contact")).getAttribute("title");
+        String emailAddresLeter = driver.findElement(By.cssSelector("span[class='text--1tHKB']")).getText();
         Verify.verify(emailAddresLeter.equals(to));
 
-        String subjectMail = driver.findElement(By.cssSelector("h2.thread-subject")).getText();
+        String subjectMail = driver.findElement(By.cssSelector("input[name='Subject']")).getAttribute("value");
         Verify.verify(subjectMail.equals(subject));
 
         String emailValue = driver.findElement(By.cssSelector("div.js-readmsg-msg > div > div > div > div")).getText();
         Verify.verify(emailValue.equals(bodyText));
 
 //---------------------7. Отправить письмо
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(BUTTON_DRAFT))).click();
-        wait.until(ExpectedConditions.titleIs(PAGE_TITLE_DRAFT));
-        driver.navigate().refresh();
-
-        wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("a.js-letter-list-item"))).get(0).click();
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[data-test-id='send']"))).click(); //нажимаем кнопку Отправить
         wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("span[class*='button2_close']")));
@@ -116,9 +89,7 @@ public class TaskOneMailTest extends LocatorsBaseTest {
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(BUTTON_DRAFT))).click();
         wait.until(ExpectedConditions.titleIs(PAGE_TITLE_DRAFT));
-        driver.navigate().refresh();
-
-        wait.until(ExpectedConditions.numberOfElementsToBe(By.cssSelector("a.js-letter-list-item"), draftLetterCountAfter-1));
+        wait.until(ExpectedConditions.numberOfElementsToBe(By.cssSelector("a.js-letter-list-item"), draftLetterCountBefore - 1));
 
 //---------------------9. Verify, что письмо появилось в папке отправленные
 

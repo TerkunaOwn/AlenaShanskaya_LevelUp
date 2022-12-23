@@ -41,10 +41,9 @@ public class TaskTwoMaillTest extends LocatorsBaseTest{
 //---------------------2.Assert, что вход выполнен успешно
 
         assertThat(USER_LOGIN).isEqualTo(driver.findElement(By.cssSelector("div.ph-project__account")).getAttribute("aria-label")); //сравниваю адреса почты
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".ph-project-promo-close-icon"))).click();//закрыть всплывашку
 
 //--------------------- 2.1.Заходим в отправленные и проверяем колличество писем ДО создания нового
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".ph-project-promo-close-icon"))).click();//закрыть всплывашку
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(BUTTON_SENT))).click();
         wait.until(ExpectedConditions.titleIs(PAGE_TITLE_SENT));
@@ -76,33 +75,24 @@ public class TaskTwoMaillTest extends LocatorsBaseTest{
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(BUTTON_SENT))).click();
         wait.until(ExpectedConditions.titleIs(PAGE_TITLE_SENT));
-
-        List<WebElement> sendtLetter = driver.findElements(By.cssSelector("a.js-letter-list-item"));
-        int sendLetterCountAfter = sendtLetter.size();
-
-        Verify.verify(sendLetterCountBefore+1 == sendLetterCountAfter);
-
-        WebElement letterElement = sendtLetter.get(0);
-        String hrefLastLetter = letterElement.getAttribute("href");
+        wait.until(ExpectedConditions.numberOfElementsToBe(By.cssSelector("a.js-letter-list-item"), sendLetterCountBefore + 1));
 
 //---------------------6. Verify, что письмо появилось в папке Тест
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(BUTTON_TEST))).click();
         wait.until(ExpectedConditions.urlToBe(URL_PAGE_TEST));
 
-        int packageLetterCountAfter = driver.findElements(By.cssSelector("a.js-letter-list-item")).size();
-        Verify.verify(packageLetterCountBefore+1 == packageLetterCountAfter);
+        wait.until(ExpectedConditions.numberOfElementsToBe(By.cssSelector("a.js-letter-list-item"), packageLetterCountBefore + 1));
 
 //---------------------7. Verify контент, адресата и тему письма (должно совпадать с пунктом 3)
 
-        driver.navigate().to(hrefLastLetter);
-        driver.navigate().refresh();
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("a.js-letter-list-item" + ":nth-of-type(1)"))).click();
 
         String emailAddresLeter = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("span.letter-contact"))).getAttribute("title");
         Verify.verify(emailAddresLeter.equals(to));
 
         String subjectMail = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div[class='thread__subject-line'] h2.thread-subject"))).getText();
-        Verify.verify(subjectMail.equals("Self: " + subject));
+        Verify.verify(subjectMail.equals(subject));
 
         String emailValue = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.js-readmsg-msg > div > div > div > div"))).getText();
         Verify.verify(emailValue.equals(bodyText));
