@@ -7,8 +7,7 @@ public class LotteryTicket {
 
     public static boolean billet(int billetNumber) {
         if (billetNumber < 100000 || billetNumber > 999999) {
-            System.out.println("Ticket not six figures!!!");
-            return false;
+            throw new IllegalArgumentException("Ticket not six figures!!!");
         }
         ArrayList<Integer> digits = new ArrayList<>();
 
@@ -19,11 +18,6 @@ public class LotteryTicket {
         }
         int firstPart = digits.get(0) + digits.get(1) + digits.get(2);
         int lastPart = digits.get(3) + digits.get(4) + digits.get(5);
-        if (firstPart == lastPart) {
-            System.out.println("Ticket happy!!!");
-            return true;
-        }
-        System.out.println("Ticket not happy!!!");
-        return false;
+        return firstPart == lastPart;
     }
 }
