@@ -22,25 +22,14 @@ public class TaskOneObjectTest extends HelperBase {
         loginInMail.pushLoginButton();
         loginInMail.enterLogin(properties.getProperty("ACCOUNT_LOGIN"));
         loginInMail.enterPassword(properties.getProperty("ACCOUNT_PASSWORD"));
-        driver.navigate().refresh();
 
 //---------------------2.Assert, что вход выполнен успешно
 
         PageMailAgent pageMailAgent = PageFactory.initElements(driver, PageMailAgent.class);
 
+        pageMailAgent.promoClose();
         String actualLogin = pageMailAgent.getLoginInIndexPage();
         assertThat(actualLogin).isEqualTo(properties.getProperty("ACCOUNT_LOGIN")); //сравниваю адреса почты
-        pageMailAgent.promoClose();
-
-//-------------------- 2.1. Заходим в черновики и проверяем колличество писем ДО создания нового
-
-        pageMailAgent.openDraftsMail();
-        int draftLetterCountBefore = pageMailAgent.getLetterListItem();
-
-//--------------------- 2.2.Заходим в отправленные и проверяем колличество писем ДО создания нового
-
-        pageMailAgent.openSentMail();
-        int sendLetterCountBefore = pageMailAgent.getLetterListItem();
 
 //---------------------3.Создать новое письмо (заполнить адресата, тему письма и тело)
 
@@ -53,10 +42,11 @@ public class TaskOneObjectTest extends HelperBase {
         pageMailAgent.closeComposeLetter();
 
 //---------------------5. Verify, что письмо сохранено в черновиках
+        pageMailAgent.verifySentMail();
+        int sendLetterCountBefore = pageMailAgent.verifySentMail();
 
         pageMailAgent.openDraftsMail();
-        int draftLetterCountAfter = pageMailAgent.getLetterListItem();
-        Verify.verify(draftLetterCountBefore+1==draftLetterCountAfter);
+        int draftLetterCountBefore = pageMailAgent.verifyDraftMail();
 
 //---------------------6. Verify контент, адресата и тему письма (должно совпадать с пунктом 3)
 
@@ -74,17 +64,12 @@ public class TaskOneObjectTest extends HelperBase {
 //---------------------8. Verify, что письмо исчезло из черновиков
 
         pageMailAgent.openDraftsMail();
-        driver.navigate().refresh();
-
-        int draftLetterCountAfter1 = pageMailAgent.getLetterListItem();
-        Verify.verify(draftLetterCountAfter-1 == draftLetterCountAfter1);
+        pageMailAgent.verifyInvisible(draftLetterCountBefore);
 
 //---------------------9. Verify, что письмо появилось в папке отправленные
 
         pageMailAgent.openSentMail();
-
-        int sendLetterCountAfter = pageMailAgent.getLetterListItem();
-        Verify.verify(sendLetterCountBefore+1 == sendLetterCountAfter);
+        pageMailAgent.verifyVisible(sendLetterCountBefore);
 
 //---------------------10. Выйти из учётной записи
 

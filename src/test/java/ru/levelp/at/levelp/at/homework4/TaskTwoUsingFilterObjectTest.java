@@ -22,15 +22,14 @@ public class TaskTwoUsingFilterObjectTest extends HelperBase {
         loginInMail.pushLoginButton();
         loginInMail.enterLogin(properties.getProperty("ACCOUNT_LOGIN"));
         loginInMail.enterPassword(properties.getProperty("ACCOUNT_PASSWORD"));
-        driver.navigate().refresh();
 
 //---------------------2.Assert, что вход выполнен успешно
 
         PageMailAgent pageMailAgent = PageFactory.initElements(driver, PageMailAgent.class);
 
+        pageMailAgent.promoClose();
         String actualLogin = pageMailAgent.getLoginInIndexPage();
         assertThat(actualLogin).isEqualTo(properties.getProperty("ACCOUNT_LOGIN")); //сравниваю адреса почты
-        pageMailAgent.promoClose();
 
 //--------------------- 2.1.Заходим в отправленные и проверяем колличество писем ДО создания нового
 
@@ -55,20 +54,17 @@ public class TaskTwoUsingFilterObjectTest extends HelperBase {
 //---------------------5. Verify, что письмо появилось в папке отправленные
 
         pageMailAgent.openSentMail();
-
-        int sendLetterCountAfter = pageMailAgent.getLetterListItem();
-        Verify.verify(sendLetterCountBefore+1 == sendLetterCountAfter);
+        pageMailAgent.verifyVisible(sendLetterCountBefore);
 
 //---------------------6. Verify, что письмо появилось в папке Тест
 
         pageMailAgent.openFolderTest();
-
-        int folderTestLetterCountAfter = pageMailAgent.getLetterListItem();
-        Verify.verify(folderTestLetterCountBefore+1 == folderTestLetterCountAfter);
+        pageMailAgent.verifyVisible(folderTestLetterCountBefore);
 
 //---------------------7. Verify контент, адресата и тему письма (должно совпадать с пунктом 3)
 
-        pageMailAgent.firstLetterInMailbox();
+        pageMailAgent.openFolderTest();
+        pageMailAgent.firstLetterInMyFolder();
 
         Verify.verify(pageMailAgent.getActualAddressInMailFolderTest().equals(properties.getProperty("ACCOUNT_LOGIN")));
         Verify.verify(pageMailAgent.getActualSubjectMailFolderTest().equals(properties.getProperty("SUBJECT_TEST")));

@@ -1,6 +1,8 @@
 package ru.levelp.at.homework4;
 
 import java.util.List;
+import com.google.common.base.Verify;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -99,6 +101,7 @@ public class PageMailAgent extends DriverHelper {
     }
 
     public String getLoginInIndexPage() {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.ph-project__account")));
         return userName.getText();
     } //получаем адресс
 
@@ -109,7 +112,29 @@ public class PageMailAgent extends DriverHelper {
     public void openDraftsMail() {
         wait.until(ExpectedConditions.visibilityOf(BUTTON_DRAFT)).click();
         wait.until(ExpectedConditions.titleIs(PAGE_TITLE_DRAFT));
-        driver.navigate().refresh();
+       // driver.navigate().refresh();
+    }
+
+    public int verifyDraftMail() {
+        wait.until(ExpectedConditions.visibilityOf((BUTTON_DRAFT))).click();
+        wait.until(ExpectedConditions.titleIs(PAGE_TITLE_DRAFT));
+        int draftLetterCountBefore = driver.findElements(By.cssSelector("a.js-letter-list-item")).size();
+        return draftLetterCountBefore;
+    }
+
+    public void verifyInvisible(int count) {
+        wait.until(ExpectedConditions.numberOfElementsToBe(By.cssSelector("a.js-letter-list-item"), count - 1));
+    }
+
+    public void verifyVisible(int count) {
+        wait.until(ExpectedConditions.numberOfElementsToBe(By.cssSelector("a.js-letter-list-item"), count + 1));
+    }
+
+    public int verifySentMail() {
+        wait.until(ExpectedConditions.visibilityOf((BUTTON_SENT))).click();
+        wait.until(ExpectedConditions.titleIs(PAGE_TITLE_SENT));
+        int sendLetterCountBefore = driver.findElements(By.cssSelector("a.js-letter-list-item")).size();
+        return sendLetterCountBefore;
     }
 
     public Integer getLetterListItem() {
@@ -157,6 +182,16 @@ public class PageMailAgent extends DriverHelper {
     public void firstLetterInMailbox() {
         wait.until(ExpectedConditions.elementToBeClickable(firstLetterInMailbox)).click();
         wait.until(ExpectedConditions.visibilityOf(actualAddressInMail));
+    }
+
+    public void firstLetterInMyFolder() {
+        wait.until(ExpectedConditions.elementToBeClickable(firstLetterInMailbox)).click();
+        wait.until(ExpectedConditions.visibilityOf(actualAddressInMailFolderTest));
+    }
+
+    public void firstLetterToMyself() {
+        wait.until(ExpectedConditions.elementToBeClickable(firstLetterInMailbox)).click();
+        wait.until(ExpectedConditions.visibilityOf(actualAddressInMailFolderMyself));
     }
 
     public String getActualAddressInMail() {

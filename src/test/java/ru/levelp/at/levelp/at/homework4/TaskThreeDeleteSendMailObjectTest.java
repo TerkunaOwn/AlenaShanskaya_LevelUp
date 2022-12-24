@@ -14,7 +14,6 @@ public class TaskThreeDeleteSendMailObjectTest extends HelperBase {
     void testDeleteSendMail() {
 
         PageLoginInMail loginInMail = new PageLoginInMail(driver);
-
 //---------------------1. Войти в почту
 
         loginInMail.openSite();
@@ -22,15 +21,14 @@ public class TaskThreeDeleteSendMailObjectTest extends HelperBase {
         loginInMail.pushLoginButton();
         loginInMail.enterLogin(properties.getProperty("ACCOUNT_LOGIN"));
         loginInMail.enterPassword(properties.getProperty("ACCOUNT_PASSWORD"));
-        driver.navigate().refresh();
 
 //---------------------2.Assert, что вход выполнен успешно
 
         PageMailAgent pageMailAgent = PageFactory.initElements(driver, PageMailAgent.class);
 
+        pageMailAgent.promoClose();
         String actualLogin = pageMailAgent.getLoginInIndexPage();
         assertThat(actualLogin).isEqualTo(properties.getProperty("ACCOUNT_LOGIN")); //сравниваю адреса почты
-        pageMailAgent.promoClose();
 
 //--------------------- 2.1.Заходим в Входящие и проверяем колличество писем ДО отправки нового
 
@@ -55,14 +53,12 @@ public class TaskThreeDeleteSendMailObjectTest extends HelperBase {
 //---------------------5. Verify, что письмо появилось в папке отправленные
 
         pageMailAgent.openMySelfMail();
-        driver.navigate().refresh();
-
-        int incomingLetterCountAfter = pageMailAgent.getLetterListItem();
-        Verify.verify(incomingLetterCountBefore+1==incomingLetterCountAfter);
+        pageMailAgent.verifyVisible(incomingLetterCountBefore);
 
 //---------------------6. Verify контент, адресата и тему письма (должно совпадать с пунктом 3)
 
-        pageMailAgent.firstLetterInMailbox();
+        pageMailAgent.openMySelfMail();
+        pageMailAgent.firstLetterToMyself();
 
         Verify.verify(pageMailAgent.getActualAddressInMailFolderMyself().equals(properties.getProperty("ACCOUNT_LOGIN")));
         Verify.verify(pageMailAgent.getActualSubjectMailFolderMyself().equals(properties.getProperty("SUBJECT")));
@@ -75,10 +71,7 @@ public class TaskThreeDeleteSendMailObjectTest extends HelperBase {
 //---------------------8. Verify что письмо появилось в папке Корзина
 
         pageMailAgent.openTrashMail();
-        driver.navigate().refresh();
-
-        int deleteLetterCountAfter = pageMailAgent.getLetterListItem();
-        Verify.verify(deleteLetterCountBefore+1==deleteLetterCountAfter);
+        pageMailAgent.verifyVisible(deleteLetterCountBefore);
 
 //---------------------9. Выйти из учётной записи
 
