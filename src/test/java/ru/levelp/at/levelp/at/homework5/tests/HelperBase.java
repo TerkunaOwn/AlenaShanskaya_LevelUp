@@ -1,6 +1,10 @@
 package ru.levelp.at.levelp.at.homework5.tests;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Properties;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,10 +12,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import ru.levelp.at.levelp.at.homework5.step.MailAgentLogin;
 import ru.levelp.at.levelp.at.homework5.step.MailAgentStep;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Properties;
 
 public class HelperBase {
 
@@ -29,7 +29,6 @@ public class HelperBase {
     void setUp() throws IOException {
         driver = new ChromeDriver();
         driver.manage().window().maximize(); //разворачиваем на весь экран
-      //  driver.manage().timeouts().implicitlyWait(Duration.ofMillis(10000));
         properties = new Properties();
         mailAgentStep = new MailAgentStep(driver);
         mailAgentLogin = new MailAgentLogin(driver);
