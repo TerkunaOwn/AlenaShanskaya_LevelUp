@@ -21,21 +21,21 @@ public class PageMailAgent extends DriverHelper {
     private WebElement promoCloseIcon;
 
     @FindBy(css = "a[data-folder-link-id='500001']")
-    private  WebElement BUTTON_DRAFT;
+    private  WebElement buttonDraft;
     @FindBy(css = "a[data-folder-link-id='500000']")
-    private WebElement BUTTON_SENT;
+    private WebElement buttonSent;
 
     @FindBy(css = "span[class='compose-button__wrapper']")
-    private WebElement BUTTON_COMPOSE;
+    private WebElement buttonCompose;
 
     @FindBy(css = "a[data-folder-link-id='1']")
-    private WebElement BUTTON_MY_FOLDER;
+    private WebElement buttonMyFolder;
 
     @FindBy(css = "a[data-folder-link-id='500015']")
-    private WebElement BUTTON_MYSELF;
+    private WebElement buttonMeSelf;
 
     @FindBy(css = "a[data-folder-link-id='500002']")
-    private WebElement BUTTON_TRASH;
+    private WebElement buttonTrash;
 
     @FindBy(css = "a.js-letter-list-item")
     private List<WebElement> letterListItem;
@@ -55,10 +55,10 @@ public class PageMailAgent extends DriverHelper {
     @FindBy(css = "span[class='text--1tHKB']")
     private WebElement actualAddressInMail;
 
-    @FindBy(css ="span[class='letter-contact']")
+    @FindBy(css = "span[class='letter-contact']")
     private WebElement actualAddressInMailFolderTest;
 
-    @FindBy(css ="span[class='letter-contact']")
+    @FindBy(css = "span[class='letter-contact']")
     private WebElement actualAddressInMailFolderMyself;
 
     @FindBy(css = "h2[class='thread-subject']")
@@ -109,13 +109,12 @@ public class PageMailAgent extends DriverHelper {
     }
 
     public void openDraftsMail() {
-        wait.until(ExpectedConditions.visibilityOf(BUTTON_DRAFT)).click();
+        wait.until(ExpectedConditions.visibilityOf(buttonDraft)).click();
         wait.until(ExpectedConditions.titleIs(PAGE_TITLE_DRAFT));
-       // driver.navigate().refresh();
     }
 
     public int verifyDraftMail() {
-        wait.until(ExpectedConditions.visibilityOf((BUTTON_DRAFT))).click();
+        wait.until(ExpectedConditions.visibilityOf((buttonDraft))).click();
         wait.until(ExpectedConditions.titleIs(PAGE_TITLE_DRAFT));
         int draftLetterCountBefore = driver.findElements(By.cssSelector("a.js-letter-list-item")).size();
         return draftLetterCountBefore;
@@ -130,7 +129,7 @@ public class PageMailAgent extends DriverHelper {
     }
 
     public int verifySentMail() {
-        wait.until(ExpectedConditions.visibilityOf((BUTTON_SENT))).click();
+        wait.until(ExpectedConditions.visibilityOf((buttonSent))).click();
         wait.until(ExpectedConditions.titleIs(PAGE_TITLE_SENT));
         int sendLetterCountBefore = driver.findElements(By.cssSelector("a.js-letter-list-item")).size();
         return sendLetterCountBefore;
@@ -141,26 +140,26 @@ public class PageMailAgent extends DriverHelper {
     }
 
     public void openSentMail() {
-        wait.until(ExpectedConditions.visibilityOf(BUTTON_SENT)).click();
+        wait.until(ExpectedConditions.visibilityOf(buttonSent)).click();
         wait.until(ExpectedConditions.titleIs(PAGE_TITLE_SENT));
         driver.navigate().refresh();
     }
 
     public void openMySelfMail() {
-        wait.until(ExpectedConditions.visibilityOf(BUTTON_MYSELF)).click();
+        wait.until(ExpectedConditions.visibilityOf(buttonMeSelf)).click();
         wait.until(ExpectedConditions.urlToBe(PAGE_URL_MYSELF));
     }
 
     public void openComposeMail() {
-        wait.until(ExpectedConditions.visibilityOf(BUTTON_COMPOSE)).click();
+        wait.until(ExpectedConditions.visibilityOf(buttonCompose)).click();
     }
 
     public void openFolderTest() {
-        wait.until(ExpectedConditions.visibilityOf(BUTTON_MY_FOLDER)).click();
+        wait.until(ExpectedConditions.visibilityOf(buttonMyFolder)).click();
     }
 
     public void openTrashMail() {
-        wait.until(ExpectedConditions.visibilityOf(BUTTON_TRASH)).click();
+        wait.until(ExpectedConditions.visibilityOf(buttonTrash)).click();
         wait.until(ExpectedConditions.urlToBe(PAGE_URL_TRASH));
     }
 
