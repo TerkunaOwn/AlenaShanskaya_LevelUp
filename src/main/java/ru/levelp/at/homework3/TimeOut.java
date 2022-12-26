@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TimeOut {
 
-    public static void sleep(long timeout){
+    public static void sleep(long timeout) {
         try {
             TimeUnit.MILLISECONDS.sleep(timeout);
         } catch (InterruptedException e) {
