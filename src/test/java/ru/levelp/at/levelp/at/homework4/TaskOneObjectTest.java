@@ -1,21 +1,21 @@
 package ru.levelp.at.levelp.at.homework4;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.google.common.base.Verify;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.support.PageFactory;
-import ru.levelp.at.homework4.PageMailAgent;
 import ru.levelp.at.homework4.PageLoginInMail;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import ru.levelp.at.homework4.PageMailAgent;
 
 public class TaskOneObjectTest extends HelperBase {
 
     @Test
-    void TaskOneSendMailTest(){
+    void taskOneSendMailTest() {
 
         PageLoginInMail loginInMail = new PageLoginInMail(driver);
 
-//---------------------1. Войти в почту
+        // 1. Войти в почту
 
         loginInMail.openSite();
 
@@ -23,7 +23,7 @@ public class TaskOneObjectTest extends HelperBase {
         loginInMail.enterLogin(properties.getProperty("ACCOUNT_LOGIN"));
         loginInMail.enterPassword(properties.getProperty("ACCOUNT_PASSWORD"));
 
-//---------------------2.Assert, что вход выполнен успешно
+        // 2.Assert, что вход выполнен успешно
 
         PageMailAgent pageMailAgent = PageFactory.initElements(driver, PageMailAgent.class);
 
@@ -31,24 +31,26 @@ public class TaskOneObjectTest extends HelperBase {
         String actualLogin = pageMailAgent.getLoginInIndexPage();
         assertThat(actualLogin).isEqualTo(properties.getProperty("ACCOUNT_LOGIN")); //сравниваю адреса почты
 
-//---------------------3.Создать новое письмо (заполнить адресата, тему письма и тело)
+        // 3.Создать новое письмо (заполнить адресата, тему письма и тело)
 
         pageMailAgent.openComposeMail();
-        pageMailAgent.fillTheFields(properties.getProperty("ACCOUNT_LOGIN"), properties.getProperty("SUBJECT"),  properties.getProperty("BODY_TEXT"));
+        pageMailAgent.fillTheFields(properties.getProperty("ACCOUNT_LOGIN"),
+            properties.getProperty("SUBJECT"),
+            properties.getProperty("BODY_TEXT"));
 
-//---------------------4. Сохранить его как черновик
+        // 4. Сохранить его как черновик
 
         pageMailAgent.buttonSaveMail();
         pageMailAgent.closeComposeLetter();
 
-//---------------------5. Verify, что письмо сохранено в черновиках
+        // 5. Verify, что письмо сохранено в черновиках
         pageMailAgent.verifySentMail();
-        int sendLetterCountBefore = pageMailAgent.verifySentMail();
+        final int sendLetterCountBefore = pageMailAgent.verifySentMail();
 
         pageMailAgent.openDraftsMail();
-        int draftLetterCountBefore = pageMailAgent.verifyDraftMail();
+        final int draftLetterCountBefore = pageMailAgent.verifyDraftMail();
 
-//---------------------6. Verify контент, адресата и тему письма (должно совпадать с пунктом 3)
+        // 6. Verify контент, адресата и тему письма (должно совпадать с пунктом 3)
 
         pageMailAgent.firstLetterInMailbox();
 
@@ -56,22 +58,22 @@ public class TaskOneObjectTest extends HelperBase {
         Verify.verify(pageMailAgent.getActualSubjectMail().equals(properties.getProperty("SUBJECT")));
         Verify.verify(pageMailAgent.getActualBodyText().equals(properties.getProperty("BODY_TEXT")));
 
-//---------------------7. Отправить письмо
+        // 7. Отправить письмо
 
         pageMailAgent.sendMail();
         pageMailAgent.closeComposeSendMail();
 
-//---------------------8. Verify, что письмо исчезло из черновиков
+        // 8. Verify, что письмо исчезло из черновиков
 
         pageMailAgent.openDraftsMail();
         pageMailAgent.verifyInvisible(draftLetterCountBefore);
 
-//---------------------9. Verify, что письмо появилось в папке отправленные
+        // 9. Verify, что письмо появилось в папке отправленные
 
         pageMailAgent.openSentMail();
         pageMailAgent.verifyVisible(sendLetterCountBefore);
 
-//---------------------10. Выйти из учётной записи
+        // 10. Выйти из учётной записи
 
         pageMailAgent.clickRightDropdown();
         pageMailAgent.clickButtonExit();
