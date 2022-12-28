@@ -116,7 +116,7 @@
         <profile>
             <id>homework5-all-tests</id>
             <properties>
-                <test.classes>homework5/*TestStep.class</test.classes>
+                <test.classes>homework5/*StepTest.class</test.classes>
             </properties>
         </profile>
 
