@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 @Feature("Работа с входящими письмами")
 @DisplayName("Домашняя работа №7.")
-public class TaskThreeStepTest extends HelperBase {
+public class TaskThreeAllureStepTest extends HelperBase {
 
     @Test
     @Story("Создать письмо. Отправить письмо. удалить письмо")

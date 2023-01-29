@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 @Feature("Работа с фильтрами")
 @DisplayName("Домашняя работа №7.")
-public class TaskTwoStepTest extends HelperBase {
+public class TaskTwoAllureStepTest extends HelperBase {
 
     @Test
     @Story("Создать письмо. Отправить письмо. Работа фильтра папок")

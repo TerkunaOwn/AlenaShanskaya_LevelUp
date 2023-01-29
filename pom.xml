@@ -131,7 +131,7 @@
         <profile>
             <id>homework7-all-tests</id>
             <properties>
-                <test.classes>homework7/*StepTest.class</test.classes>
+                <test.classes>homework7/*AllureStepTest.class</test.classes>
             </properties>
         </profile>
     </profiles>
@@ -178,7 +178,7 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <includes>
-                        <include>homework7/*StepTest.class</include>
+                        <include>homework7/*AllureStepTest.class</include>
                     </includes>
                     <argLine>
                         -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"

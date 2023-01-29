@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 @Feature("Работа с черновиками")
 @DisplayName("Домашняя работа №7.")
-public class TaskOneStepTest extends HelperBase {
+public class TaskOneAllureStepTest extends HelperBase {
 
     @Test
     @Story("Создать письмо. Сохранить письмо в черновике. Отправить письмо из черновика")
